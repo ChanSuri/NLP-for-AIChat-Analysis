@@ -20,15 +20,14 @@ tokenizer = BertTokenizer.from_pretrained(model_name)
 model = BertModel.from_pretrained(model_name)
 model.eval()
 
-
 # 读取CSV文件
-df = pd.read_csv('dataset/question_num.csv')
-texts = df['question'].tolist()
+df = pd.read_csv('dataset/ProjectText.csv')
+texts = df['one_liner'].tolist()
 
 # PCA HERE: 0:sport 1:business 2:tech 3:politics 4:entertainment
 # label_map = {0: 'tech'401, 1: 'sport'511, 2: 'business'510, 3: 'politics'417, 4: 'entertainment'386}
-labels = df['category_num'].replace({0: 2, 1: 0, 2: 1})
-label_counts = labels.value_counts().sort_index()
+# labels = df['category_num'].replace({0: 2, 1: 0, 2: 1})
+# label_counts = labels.value_counts().sort_index()
 
 #stemmer = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
@@ -107,7 +106,7 @@ def find_optimal_k(embeddings, k_range):
     return scores
 #######################################################
 # Define a range of n_components to test
-n_components_range = [2, 5, 10, 20, 30, 50]
+n_components_range = [2, 5, 10, 20, 30, 50,70]
 
 # Store results for evaluation
 umap_results = {}
