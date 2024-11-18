@@ -15,4 +15,4 @@
 | **ELECTRA**        | 4                  | Cluster 0: ['help', 'sound', 'work', 'best', 'smart'] <br> Cluster 1: ['led', 'time', 'game', 'light', 'turn', 'temperature', 'button', 'service', 'monitor'] <br> Cluster 2: ['project', 'arduino', 'display', 'know', 'programming', 'clock', 'data', 'projeto'] <br> Cluster 3: ['arduino', 'using', 'control', 'project', 'light', 'use', 'sensor', 'simple', 'led', 'robot'] | 0.5100 | 3: 306, 1: 276, 2: 230, 0: 188 | 
 
 ## Models performance:
-RoBERTa > DistilBERT > DeBERTa > ALBERT > BART > ELECTRA > T5 > SentenceBERT 
+RoBERTa > DistilBERT > DeBERTa > ALBERT > BART > ELECTRA > T5 > SentenceBERT
