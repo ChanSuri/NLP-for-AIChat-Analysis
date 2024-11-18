@@ -1,4 +1,4 @@
-# genAI-assistant-analysis
+# Result
 
 ## Different Models Comparison
 
