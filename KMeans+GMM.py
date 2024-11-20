@@ -17,7 +17,7 @@ from sklearn.metrics import silhouette_score
 # nltk.download("wordnet")
 # nltk.download("punkt")
 stop_words = set(stopwords.words("english"))
-custom_stop_words = {"the", "one", "uno", "una", "para","arduino"}
+custom_stop_words = {"the", "one","uno","una","para","une","que","com",'por','del','ist','und','die','das','der','arduino','questo'}
 stop_words.update(custom_stop_words)
 
 lemmatizer = WordNetLemmatizer()
@@ -73,25 +73,42 @@ plt.title('Broad Categories Clustering (KMeans)', fontsize=16)
 plt.colorbar(label='Cluster Label')
 plt.show()
 
+def find_best_gmm_components(data, max_components=10):
+    best_bic = np.inf
+    best_n_components = 0
+    for n_components in range(1, max_components+1):
+        gmm = GaussianMixture(n_components=n_components, random_state=42)
+        gmm.fit(data)
+        bic = gmm.bic(data)
+        if bic < best_bic:
+            best_bic = bic
+            best_n_components = n_components
+    return best_n_components
+
 # Second clustering: GMM for fine-grained categories within each broad cluster
 fine_grained_labels = {}
 pca = PCA(n_components=2)  # For visualization later
+umap_reducer = umap.UMAP(n_neighbors=10, min_dist=0.05, n_components=2, random_state=42)
 
 for broad_label in df['broad_cluster'].unique():
     # Filter embeddings for the current broad cluster
     indices = df[df['broad_cluster'] == broad_label].index
     cluster_embeddings = text_embeddings[indices]
+    
+    #reduced_sub_embeddings = umap_reducer.fit_transform(cluster_embeddings)
+    reduced_sub_embeddings = pca.fit_transform(cluster_embeddings)
 
     # Apply GMM for fine-grained clustering
-    gmm = GaussianMixture(n_components=3, random_state=42)  # Adjust n_components as needed
-    sub_labels = gmm.fit_predict(cluster_embeddings)
+    best_n_components = find_best_gmm_components(reduced_sub_embeddings)
+    gmm = GaussianMixture(n_components=best_n_components,random_state=42,n_init=10)  # Adjust n_components as needed
+    sub_labels = gmm.fit_predict(reduced_sub_embeddings)
     fine_grained_labels[broad_label] = sub_labels
 
     # Assign fine-grained cluster labels to the dataframe
     df.loc[indices, 'fine_cluster'] = sub_labels
 
     # Visualize fine-grained clusters for the current broad cluster
-    reduced_sub_embeddings = pca.fit_transform(cluster_embeddings)
+    
     plt.figure(figsize=(10, 8))
     plt.scatter(reduced_sub_embeddings[:, 0], reduced_sub_embeddings[:, 1], c=sub_labels, cmap='tab10', marker='o')
     plt.title(f'Fine-Grained Clustering for Broad Cluster {broad_label}', fontsize=16)
@@ -106,8 +123,10 @@ def extract_keywords_for_clusters(texts, labels):
     for label in np.unique(labels):
         cluster_texts = [texts[idx] for idx, l in enumerate(labels) if l == label]
         if len(cluster_texts) > 0:
-            keywords = kw_model.extract_keywords(" ".join(cluster_texts), top_n=5)
-            keywords_per_cluster[label] = [kw[0] for kw in keywords]
+            joined_text = " ".join(cluster_texts)
+            keywords = kw_model.extract_keywords(joined_text, top_n=10)
+            filtered_keywords = [kw[0] for kw in keywords if kw[0].lower() not in stop_words]
+            keywords_per_cluster[label] = filtered_keywords
     return keywords_per_cluster
 
 # Extract and display keywords for broad categories
