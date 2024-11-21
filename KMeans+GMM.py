@@ -88,14 +88,12 @@ def find_best_gmm_components(data, max_components=10):
 # Second clustering: GMM for fine-grained categories within each broad cluster
 fine_grained_labels = {}
 pca = PCA(n_components=2)  # For visualization later
-umap_reducer = umap.UMAP(n_neighbors=10, min_dist=0.05, n_components=2, random_state=42)
 
 for broad_label in df['broad_cluster'].unique():
     # Filter embeddings for the current broad cluster
     indices = df[df['broad_cluster'] == broad_label].index
     cluster_embeddings = text_embeddings[indices]
     
-    #reduced_sub_embeddings = umap_reducer.fit_transform(cluster_embeddings)
     reduced_sub_embeddings = pca.fit_transform(cluster_embeddings)
 
     # Apply GMM for fine-grained clustering
