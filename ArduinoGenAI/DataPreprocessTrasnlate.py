@@ -1,23 +1,26 @@
 import re
+import pandas as pd
 from nltk.stem import WordNetLemmatizer
 from googletrans import Translator
 from translatepy import Translator as TranslatepyTranslator
 from langdetect import detect
-import pandas as pd
+from nltk.corpus import stopwords
+from gensim.utils import simple_preprocess
 import nltk
-
-
-lemmatizer = WordNetLemmatizer()
+# nltk.download('stopwords')
+stop_words = set(stopwords.words('english'))
 
 def preprocess_text(text):
+    lemmatizer = WordNetLemmatizer()
     if not isinstance(text, str) or text.strip() == "":
         return text  # NULL
 
     try:
         text = text.lower()
+        [word for word in simple_preprocess(text) if word not in stop_words]
 
         # remove Binary num
-        text = re.sub(r'B[01]{8}(,\s*|\s*)', '', text)
+        text = re.sub(r"PROGMEM|#include\s*<[^>]+>|//.*?$", "code ", text, flags=re.MULTILINE)
 
         # 统一移除代码相关内容：PROGMEM数据块、函数代码块、#include语句、函数调用
         text = re.sub(
@@ -29,10 +32,11 @@ def preprocess_text(text):
         )
 
         # 替换 URL 为 "url"
-        text = re.sub(r'https?://\S+', 'url', text)
+        text = re.sub(r'https?://\S+', ' ', text)
 
-        text = re.sub(r'/[\w/.-]+', 'path', text)
+        text = re.sub(r'/[\w/.-]+', ' ', text)
 
+        text = re.sub(r"[^a-zA-Z0-9 .,?]", " ", text)  # 替换所有非允许字符为空格
         # 移除多余空格和换行符
         text = re.sub(r'\s+', ' ', text).strip()
 
@@ -45,9 +49,10 @@ def preprocess_text(text):
         return text  # return orginal text while error
     return text
 
-translator = TranslatepyTranslator()
+
 #translator = Translator()
 def translate_to_english(text):
+    translator = TranslatepyTranslator()
     try:
         if not isinstance(text, str) or text.strip() == "":
             return text
@@ -72,10 +77,10 @@ def translate_to_english(text):
         return text
 
 
-df = pd.read_csv('dataset/ArduinoGenAI.csv')
+df = pd.read_csv('dataset/ArduinoGenAI.csv', sep=None, engine='python')
 
-df["cleaned_text"] = df['d_question-submitted'].apply(preprocess_text)
+df["cleaned_text"] = df['d_question_submitted'].apply(preprocess_text)
 df['question_translated'] = df['cleaned_text'].apply(translate_to_english)
 
-# 保存结果
+
 df.to_csv('dataset/Translated_Text.csv', index=False)
