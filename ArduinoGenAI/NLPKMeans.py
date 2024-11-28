@@ -22,7 +22,7 @@ stop_words = set(stopwords.words("english"))
 custom_stop_words = {"the", "one", "void"}
 stop_words.update(custom_stop_words)
 
-df = pd.read_csv('dataset/ArduinoGenAI.csv')
+df = pd.read_csv('dataset/ArduinoGenAI.csv', sep=None, engine='python')
 df["cleaned_text"] = df['d_question_submitted'].apply(DataPreprocessTrasnlate.preprocess_text)
 df['question_translated'] = df['cleaned_text'].apply(DataPreprocessTrasnlate.translate_to_english)
 
@@ -66,6 +66,8 @@ for k in range(min_k, max_k + 1):
 print(f"\nBest K (with highest Silhouette Score): {best_k}")
 print(f"Best Silhouette Score: {best_silhouette_score}")
 
+#cluster 0:2 1:0 2:3 3:1
+# best_k = 4
 # Cluster with the best K
 best_kmeans = KMeans(n_clusters=best_k, random_state=42)
 df['cluster'] = best_kmeans.fit_predict(reduced_embeddings)
@@ -73,9 +75,9 @@ df['cluster'] = best_kmeans.fit_predict(reduced_embeddings)
 print("Cluster counts:")
 print(df['cluster'].value_counts())
 
-cluster_1_data = df[df['cluster'] == 1]
-print(cluster_1_data['question_translated'])
-
+# cluster_1_data = df[df['cluster'] == 1]
+# print(cluster_1_data['question_translated'])
+df.to_csv('dataset/Test_Text.csv', index=False)
 
 # filter useless words 
 def filter_keywords(keywords, min_length=2):

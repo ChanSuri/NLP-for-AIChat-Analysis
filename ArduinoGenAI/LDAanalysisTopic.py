@@ -34,7 +34,7 @@ print("\nBag-of-Words 表示:")
 print(corpus)
 
 # 训练 LDA 模型
-num_topics = 3  # 设置主题数量
+num_topics = 4  # 设置主题数量
 lda_model = LdaModel(
     corpus=corpus,
     id2word=dictionary,
@@ -48,11 +48,11 @@ print("\nLDA 模型的主题关键词:")
 for idx, topic in lda_model.print_topics(num_words=5):
     print(f"主题 {idx + 1}: {topic}")
 
-# 分析文档的主题分布
-print("\n每个文档的主题分布:")
-for i, doc in enumerate(corpus):
-    doc_topics = lda_model.get_document_topics(doc)
-    print(f"文档 {i + 1}: {doc_topics}")
+# # 分析文档的主题分布
+# print("\n每个文档的主题分布:")
+# for i, doc in enumerate(corpus):
+#     doc_topics = lda_model.get_document_topics(doc)
+#     print(f"文档 {i + 1}: {doc_topics}")
 
 # 可视化主题
 print("\n生成主题模型的可视化...")

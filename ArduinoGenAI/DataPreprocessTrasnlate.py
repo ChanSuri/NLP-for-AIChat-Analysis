@@ -20,7 +20,7 @@ def preprocess_text(text):
         [word for word in simple_preprocess(text) if word not in stop_words]
 
         # remove Binary num
-        text = re.sub(r"PROGMEM|#include\s*<[^>]+>|//.*?$", "code ", text, flags=re.MULTILINE)
+        text = re.sub(r"PROGMEM|#include\s*<[^>]+>|//.*?$", " ", text, flags=re.MULTILINE)
 
         # 统一移除代码相关内容：PROGMEM数据块、函数代码块、#include语句、函数调用
         text = re.sub(
@@ -28,7 +28,7 @@ def preprocess_text(text):
             r'void\s+\w+\s*{[^}]*}|'
             r'(?i)#include\s+<[^>]+>|'
             r'[A-Za-z_]+\([^)]*\)',  # 函数调用
-            'code', text, flags=re.DOTALL 
+            ' ', text, flags=re.DOTALL 
         )
 
         # 替换 URL 为 "url"
@@ -57,8 +57,6 @@ def translate_to_english(text):
         if not isinstance(text, str) or text.strip() == "":
             return text
         
-        # text = re.sub(r'https?://\S+', 'website', text)
-        # text = re.sub(r'[A-Za-z_]+\([^)]*\)', 'code', text)
         detected_lang = detect(text)
 
         if detected_lang == "en":
