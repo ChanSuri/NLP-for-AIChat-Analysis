@@ -49,8 +49,10 @@ def preprocess_text(text):
 #     ]
 #     return " ".join(filtered_words)
 
-df = pd.read_csv('dataset/ProjectText.csv')
-df["cleaned_text"] = df['one_liner'].apply(preprocess_text)
+# df = pd.read_csv('dataset/ProjectText.csv')
+# df["cleaned_text"] = df['one_liner'].apply(preprocess_text)
+df = pd.read_csv('dataset/Translated_Text.csv', sep=None, engine='python')
+df["cleaned_text"] = df['question_translated']
 
 # RoBERTa generate embedding
 model_name = "roberta-base" # 3:0.53 / 5:0.48
@@ -75,7 +77,7 @@ reducer = umap.UMAP(n_neighbors=20, n_components=2, random_state=42)
 reduced_embeddings = reducer.fit_transform(text_embeddings)
 
 # Find the best K for clustering
-min_k = 2
+min_k = 4
 max_k = 10
 best_k = None
 best_silhouette_score = -1

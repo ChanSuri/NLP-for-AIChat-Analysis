@@ -21,6 +21,9 @@ import umap
 # 1. 数据读取
 df = pd.read_csv('dataset/Translated_Text.csv', sep=None, engine='python')
 texts = df['question_translated'].dropna().tolist()  # 获取聊天文本并去除缺失值
+# domain_keywords = ["create", "fix", "error", "explain", "why","sketch","code","generate"]
+# texts = [" ".join([text, " ".join(domain_keywords)]) for text in texts]
+
 
 # 3. 使用BERT获取文本嵌入
 model_name = "roberta-base"#"facebook/bart-base""distilbert-base-uncased"
@@ -58,7 +61,7 @@ kmeans.fit(reduced_embeddings)
 df['cluster'] = kmeans.labels_
 print(df[['question_translated', 'cluster']])
 
-cluster_to_label = {0: 'Knowledge', 1: 'Code Generation', 2: 'Fix error', 3: 'other'}
+cluster_to_label = {0: 'other', 1: 'Code Generation', 2: 'Fix error', 3: 'Knowledge'}
 df['label'] = df['cluster'].map(cluster_to_label)
 
 le = LabelEncoder()
@@ -130,7 +133,7 @@ def plot_classification_results(y_test, y_pred):
     cm = confusion_matrix(y_test, y_pred)
 
     plt.figure(figsize=(6, 5))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['create code', 'fix error', 'explain','content'], yticklabels=['create code', 'fix error', 'explain','content'])
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['create code', 'fix error', 'knowledge','other'], yticklabels=['create code', 'fix error', 'knowledge','other'])
     plt.title('Confusion Matrix for Sentiment Classification')
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
@@ -138,6 +141,8 @@ def plot_classification_results(y_test, y_pred):
 
 # 绘制分类结果图（情感分类示例）
 plot_classification_results(y_test, y_pred)
+
+df.to_csv('dataset/result.csv', index=False)
 
 
 # joblib.dump(kmeans, 'kmeans_model.pkl')
